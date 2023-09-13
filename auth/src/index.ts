@@ -8,6 +8,7 @@ import { signupRouter } from './routes/signup';
 import { errorHandler } from './middlewares/error-handler';
 import { NotFoundError } from './errors/not-found-error';
 import mongoose from 'mongoose';
+import 'dotenv/config'
 
 
 const app = express();
