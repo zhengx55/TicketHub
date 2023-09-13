@@ -9,11 +9,17 @@ import { errorHandler } from './middlewares/error-handler';
 import { NotFoundError } from './errors/not-found-error';
 import mongoose from 'mongoose';
 import 'dotenv/config'
+import cookieSession from 'cookie-session';
 
 
 const app = express();
 app.use(json());
+app.set('trust proxy', true)
+app.use(cookieSession({
+    signed: false,
+    secure: true,
 
+}))
 app.use(currentUserRouter);
 app.use(signinRouter);
 app.use(signOutRouter);
@@ -23,6 +29,9 @@ app.all('*', async () => {
 })
 app.use(errorHandler);
 const bootstrap = async () => {
+    if (!process.env.JWT_KEY) {
+        throw new Error('JWT_KEY is required')
+    }
     try {
         await mongoose.connect('mongodb://auth-mongo-srv:27017/auth')
         console.log('mongod connection established');
