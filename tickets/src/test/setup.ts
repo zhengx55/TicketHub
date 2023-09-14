@@ -2,9 +2,10 @@ import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import request from "supertest";
 import { app } from "../app";
+import { sign } from "jsonwebtoken";
 
 declare global {
-  var signin: () => Promise<string[]>;
+  var signin: () => string[];
 }
 
 let mongo: any;
@@ -33,19 +34,20 @@ afterAll(async () => {
   await mongoose.connection.close();
 });
 
-global.signin = async () => {
-  const email = "test@test.com";
-  const password = "password";
-
-  const response = await request(app)
-    .post("/api/users/signup")
-    .send({
-      email,
-      password,
-    })
-    .expect(201);
-
-  const cookie = response.get("Set-Cookie");
-
-  return cookie;
+global.signin = () => {
+  // Faking authentication
+  // Build a JWT payload with mock data
+  // Build session Object
+  // Turn that session into JSON
+  // Take JSON and encode it as base64
+  // return a string thats the cookie with the encoded data
+  const payload = {
+    id: "jest-test-user01",
+    emial: "test-01@test.com",
+  };
+  const token = sign(payload, process.env.JWT_KEY!);
+  const session = { jwt: token };
+  const session_json = JSON.stringify(session);
+  const base64 = Buffer.from(session_json).toString("base64");
+  return [`session=${base64}`];
 };
