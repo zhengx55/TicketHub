@@ -15,3 +15,12 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
+    - image: zhengx55/tickets
+      context: tickets
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .
+
