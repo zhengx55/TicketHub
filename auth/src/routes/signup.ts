@@ -3,7 +3,10 @@ import { body, validationResult } from "express-validator";
 
 import { User } from "../models/user";
 import { sign } from "jsonwebtoken";
-import { BadRequestError, RequestValidationError, validateRequest } from "@zhengx-test/tickethub-common";
+import {
+  BadRequestError,
+  validateRequest,
+} from "@zhengx-test/tickethub-common";
 
 const router = express.Router();
 
@@ -18,10 +21,6 @@ router.post(
   ],
   validateRequest,
   async (req: Request, res: Response) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      throw new RequestValidationError(errors.array());
-    }
     const { email, password } = req.body;
     // 1.check if user exists
     const existingUser = await User.findOne({ email });
