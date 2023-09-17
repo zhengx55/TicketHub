@@ -2,7 +2,8 @@ import request from "supertest";
 import { app } from "../../app";
 import { Ticket } from "../../model/tickets";
 import mongoose from "mongoose";
-
+// jest redirect
+jest.mock("../../nats-wrapper");
 it("can only be accessed if the user is signed in", async () => {
   const response = await request(app).post("/api/tickets").send({});
   // Unauthenticated error status

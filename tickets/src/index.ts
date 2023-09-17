@@ -10,11 +10,20 @@ const bootstrap = async () => {
   if (!process.env.MONGO_URI) {
     throw new Error("MONGO_URI is required");
   }
+  if (!process.env.NATS_CLUSTER) {
+    throw new Error("JWT_KEY is required");
+  }
+  if (!process.env.NATS_URL) {
+    throw new Error("MONGO_URI is required");
+  }
+  if (!process.env.NATS_CLIENT_ID) {
+    throw new Error("MONGO_URI is required");
+  }
   try {
     await natsWrapper.connect(
-      "ticketing",
-      "ticket-service",
-      "http://nats-srv:4222"
+      process.env.NATS_CLUSTER,
+      process.env.NATS_CLIENT_ID,
+      process.env.NATS_URL
     );
     natsWrapper.client.on("close", () => {
       process.exit();
