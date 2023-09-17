@@ -7,6 +7,8 @@ import {
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
 import { Ticket } from "../model/tickets";
+import { TicketCreatedPubslisher, TicketUpdatedPublisher } from "../publisher";
+import { natsWrapper } from "../nats-wrapper";
 
 const router = express.Router();
 
@@ -30,6 +32,12 @@ router.post(
       userId: req.currentUser!.id,
     });
     await newTicket.save();
+    new TicketCreatedPubslisher(natsWrapper.client).publish({
+      id: newTicket.id,
+      title: newTicket.title,
+      userId: newTicket.userId,
+      price: Number(newTicket.price),
+    });
     res.status(201).send(newTicket);
   }
 );
@@ -74,6 +82,12 @@ router.put(
       price: req.body.price,
     });
     await ticket.save();
+    new TicketUpdatedPublisher(natsWrapper.client).publish({
+      id: ticket.id,
+      title: ticket.title,
+      userId: ticket.userId,
+      price: Number(ticket.price),
+    });
 
     res.send(ticket);
   }
