@@ -23,4 +23,13 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
+    - image: zhengx55/order
+      context: order
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .
+
 

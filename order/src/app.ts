@@ -8,7 +8,7 @@ import {
   currentUser,
   errorHandler,
 } from "@zhengx-test/tickethub-common";
-
+import { OrderRouter } from "./routes/order-route";
 
 const app = express();
 app.use(json());
@@ -20,6 +20,7 @@ app.use(
   })
 );
 app.use(currentUser);
+app.use(OrderRouter);
 app.all("*", async () => {
   throw new NotFoundError();
 });
