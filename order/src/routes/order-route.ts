@@ -11,6 +11,11 @@ import { body } from "express-validator";
 import mongoose from "mongoose";
 import { Ticket } from "../model/ticket";
 import { Order } from "../model";
+import { natsWrapper } from "../nats-wrapper";
+import {
+  OrderCancelledPublisher,
+  OrderCratedPublisher,
+} from "../event/publisher";
 
 const EXPIRATION_WINDOW_SECONDS = 15 * 60;
 
@@ -51,7 +56,7 @@ router.patch(
   "/api/order/:orderId",
   requireAuth,
   async (req: Request, res: Response) => {
-    const order = await Order.findById(req.params.orderId);
+    const order = await Order.findById(req.params.orderId).populate("ticket");
     if (!order) {
       throw new NotFoundError();
     }
@@ -59,6 +64,12 @@ router.patch(
       throw new UnauthorizedError();
     }
     order.status = OrderStatus.Cancelled;
+    new OrderCancelledPublisher(natsWrapper.client).publish({
+      id: order.id,
+      ticket: {
+        id: order.ticket.id,
+      },
+    });
     await order.save();
     res.status(204).send({ msg: "Delete order successfully" });
   }
@@ -106,6 +117,16 @@ router.post(
     await order.save();
     // publish an order-created event to nats-service
 
+    new OrderCratedPublisher(natsWrapper.client).publish({
+      id: order.id,
+      status: OrderStatus.Created,
+      userId: order.userId,
+      expiresAt: order.expiresAt.toISOString(),
+      ticket: {
+        id: ticket.id,
+        price: ticket.price,
+      },
+    });
     res.status(201).send(order);
   }
 );
