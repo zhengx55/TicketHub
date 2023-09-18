@@ -10,7 +10,7 @@ interface OrderAttrs {
 }
 
 interface OrderDoc extends Document {
-  title: string;
+  status: string;
   expiresAt: Date;
   userId: string;
   ticket: TicketDoc;
