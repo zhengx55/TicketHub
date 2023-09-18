@@ -5,6 +5,7 @@ import { Order } from ".";
 interface TicketAttrs {
   title: string;
   price: number;
+  id: string;
 }
 export interface TicketDoc extends Document {
   title: string;
@@ -38,7 +39,11 @@ const TicketSchema = new Schema(
 );
 
 TicketSchema.statics.build = (attrs: TicketAttrs) => {
-  return new Ticket(attrs);
+  return new Ticket({
+    _id: attrs.id,
+    title: attrs.title,
+    price: attrs.price,
+  });
 };
 TicketSchema.methods.isReserved = async function () {
   const existingOrder = await Order.findOne({

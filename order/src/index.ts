@@ -2,6 +2,7 @@ import "express-async-errors";
 import mongoose from "mongoose";
 import { app } from "./app";
 import { natsWrapper } from "./nats-wrapper";
+import { TicketCreatedListener, TicketUpdatedListener } from "./event/listener";
 
 const bootstrap = async () => {
   if (!process.env.JWT_KEY) {
@@ -30,7 +31,8 @@ const bootstrap = async () => {
     });
     process.on("SIGINT", () => natsWrapper.client.close());
     process.on("SIGTERM", () => natsWrapper.client.close());
-
+    new TicketCreatedListener(natsWrapper.client).listen();
+    new TicketUpdatedListener(natsWrapper.client).listen();
     await mongoose.connect(process.env.MONGO_URI);
     console.log("mongod connection established");
   } catch (error) {}
